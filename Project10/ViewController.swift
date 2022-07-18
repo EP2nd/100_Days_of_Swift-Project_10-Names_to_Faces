@@ -89,15 +89,19 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     @objc func addNewPerson() {
         let picker = UIImagePickerController()
         picker.allowsEditing = true
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            picker.sourceType = .camera
+        } else {
+                picker.sourceType = .photoLibrary
+            }
+        
         picker.delegate = self
         present(picker, animated: true)
     }
     
-    @objc func deletePerson() {
-        
-    }
-    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
         guard let image = info[.editedImage] as? UIImage else { return }
         
         let imageName = UUID().uuidString
