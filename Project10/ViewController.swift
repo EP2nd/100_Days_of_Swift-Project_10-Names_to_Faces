@@ -7,6 +7,14 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let defaults = UserDefaults.standard
+        
+        if let savedPeople = defaults.object(forKey: "people") as? Data {
+            if let decodedPeople = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(savedPeople) as? [Person] {
+                people = decodedPeople
+            }
+        }
+        
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewPerson))
     }
     
@@ -61,6 +69,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
             person.name = newName
             
             self?.collectionView.reloadData()
+            self?.save()
         })
         
         let deleteAPersonAC = UIAlertController(title: "Delete a person", message: "Are you sure you would like to delete this person?", preferredStyle: .alert)
@@ -68,6 +77,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         deleteAPersonAC.addAction(UIAlertAction(title: "Delete", style: .default) { UIAlertAction in
             self.people.remove(at: indexPath.item)
             self.collectionView.reloadData()
+            self.save()
         })
         
         let alertController = UIAlertController(title: "What would you like to do?", message: nil, preferredStyle: .alert)
@@ -121,6 +131,13 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
+    }
+    
+    func save() {
+        if let savedData = try? NSKeyedArchiver.archivedData(withRootObject: people, requiringSecureCoding: false) {
+            let defaults = UserDefaults.standard
+            defaults.set(savedData, forKey: "people")
+        }
     }
 }
 
