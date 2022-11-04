@@ -1,13 +1,70 @@
+//
+//  SceneDelegate.swift
+//  Project10
+//
+//  Created by Edwin Przeźwiecki Jr. on 12/07/2022.
+//
+
+/// Project 28, challenge 3:
+import LocalAuthentication
 import UIKit
 
 class ViewController: UICollectionViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     var people = [Person]()
     
+    /// Project 28, challenge 3:
+    var hiddenPeople = [Person]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewPerson))
+        
+        /// Project 28, challenge 3:
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(savePeople), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(authenticate), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    /// Project 28, challenge 3:
+    @objc func savePeople() {
+        hiddenPeople += people
+        people = [Person]()
+        collectionView.reloadData()
+    }
+    
+    /// Project 28, challenge 3:
+    func loadPeople() {
+        people += hiddenPeople
+        hiddenPeople = [Person]()
+        collectionView.reloadData()
+    }
+    
+    @objc func authenticate() {
+        let context = LAContext()
+        var error: NSError?
+        
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            let reason = "Please identify yourself."
+            
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authenticationError in
+                
+                DispatchQueue.main.async {
+                    if success {
+                        self?.loadPeople()
+                    } else {
+                        let ac = UIAlertController(title: "Authentication failed", message: "You could not be verified. Please try again.", preferredStyle: .alert)
+                        ac.addAction(UIAlertAction(title: "OK", style: .default))
+                        self?.present(ac, animated: true)
+                    }
+                }
+            }
+        } else {
+            let ac = UIAlertController(title: "Biometry unavailable", message: "Your device is not configured for biometric authentication.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
