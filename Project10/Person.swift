@@ -1,6 +1,15 @@
+//
+//  Person.swift
+//  Project10
+//
+//  Created by Edwin Przeźwiecki Jr. on 12/07/2022.
+//
+
 import UIKit
 
+/// Project 12a:
 class Person: NSObject, NSCoding {
+    
     var name: String
     var image: String
     

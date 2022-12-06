@@ -1,9 +1,11 @@
 //
-//  SceneDelegate.swift
+//  ViewController.swift
 //  Project10
 //
 //  Created by Edwin Przeźwiecki Jr. on 12/07/2022.
 //
+
+/// *The solution to the third challenge and Project 12b can be found in separate repositories.*
 
 /// Project 28, challenge 3:
 import LocalAuthentication
@@ -19,6 +21,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        /// Project 12a:
         let defaults = UserDefaults.standard
         
         if let savedPeople = defaults.object(forKey: "people") as? Data {
@@ -39,6 +42,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     @objc func savePeople() {
         hiddenPeople += people
         people = [Person]()
+        
         collectionView.reloadData()
     }
     
@@ -46,10 +50,13 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     func loadPeople() {
         people += hiddenPeople
         hiddenPeople = [Person]()
+        
         collectionView.reloadData()
     }
     
+    /// Project 28, challenge 3:
     @objc func authenticate() {
+        
         let context = LAContext()
         var error: NSError?
         
@@ -80,16 +87,18 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Person", for: indexPath) as? PersonCell else {
             fatalError("Unable to dequeue PersonCell.")
         }
+        
         let person = people[indexPath.item]
         
         cell.name.text = person.name
         
         let path = getDocumentsDirectory().appendingPathComponent(person.image)
-        cell.imageView.image = UIImage(contentsOfFile: path.path)
         
+        cell.imageView.image = UIImage(contentsOfFile: path.path)
         cell.imageView.layer.borderColor = UIColor(white: 0, alpha: 0.3).cgColor
         cell.imageView.layer.borderWidth = 2
         cell.imageView.layer.cornerRadius = 3
@@ -97,6 +106,8 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         
         return cell
     }
+    
+    ///Challenge 1:
     
     /* override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
      let person = people[indexPath.item]
@@ -116,28 +127,38 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
  } */
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-     let person = people[indexPath.item]
+     
+        let person = people[indexPath.item]
         
         let setANameAC = UIAlertController(title: "Set a name", message: "Please enter a name.", preferredStyle: .alert)
+        
         setANameAC.addTextField()
         setANameAC.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         setANameAC.addAction(UIAlertAction(title: "Save", style: .default) { [weak self, weak setANameAC] _ in
+            
             guard let newName = setANameAC?.textFields?[0].text else { return }
+            
             person.name = newName
             
             self?.collectionView.reloadData()
+            /// Project 12a:
             self?.save()
         })
         
         let deleteAPersonAC = UIAlertController(title: "Delete a person", message: "Are you sure you would like to delete this person?", preferredStyle: .alert)
+        
         deleteAPersonAC.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         deleteAPersonAC.addAction(UIAlertAction(title: "Delete", style: .default) { UIAlertAction in
+            
             self.people.remove(at: indexPath.item)
+            
             self.collectionView.reloadData()
+            /// Project 12a:
             self.save()
         })
         
         let alertController = UIAlertController(title: "What would you like to do?", message: nil, preferredStyle: .alert)
+        
         alertController.addAction(UIAlertAction(title: "Set a name", style: .default) { UIAlertAction in
             DispatchQueue.main.async {
                 self.present(setANameAC, animated: true)
@@ -154,9 +175,12 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     }
     
     @objc func addNewPerson() {
+        
         let picker = UIImagePickerController()
+        
         picker.allowsEditing = true
         
+        /// Challenge 2:
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             picker.sourceType = .camera
         } else {
@@ -164,6 +188,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
             }
         
         picker.delegate = self
+        
         present(picker, animated: true)
     }
     
@@ -179,7 +204,9 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         }
         
         let person = Person(name: "Unknown", image: imageName)
+        
         people.append(person)
+        
         collectionView.reloadData()
         
         dismiss(animated: true)
@@ -190,11 +217,13 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         return paths[0]
     }
     
+    /// Project 12a:
     func save() {
         if let savedData = try? NSKeyedArchiver.archivedData(withRootObject: people, requiringSecureCoding: false) {
+            
             let defaults = UserDefaults.standard
+            
             defaults.set(savedData, forKey: "people")
         }
     }
 }
-

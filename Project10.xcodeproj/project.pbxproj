@@ -64,10 +64,10 @@
 				B888DC25287D5CF300713D3C /* SceneDelegate.swift */,
 				B888DC27287D5CF300713D3C /* ViewController.swift */,
 				B89B949D287DBCCD00A35E25 /* Person.swift */,
-				B888DC29287D5CF300713D3C /* Main.storyboard */,
 				B8774C61287D6FFF008DDC76 /* PersonCell.swift */,
-				B888DC2C287D5CF600713D3C /* Assets.xcassets */,
+				B888DC29287D5CF300713D3C /* Main.storyboard */,
 				B888DC2E287D5CF600713D3C /* LaunchScreen.storyboard */,
+				B888DC2C287D5CF600713D3C /* Assets.xcassets */,
 				B888DC31287D5CF600713D3C /* Info.plist */,
 			);
 			path = Project10;
